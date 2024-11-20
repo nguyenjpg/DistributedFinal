@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class masterServer {
     public static void main(String[] args) throws IOException {
@@ -41,9 +42,24 @@ class Handler implements Runnable {
             BufferedReader br = new BufferedReader (new InputStreamReader (client.getInputStream()));
             PrintWriter pw = new PrintWriter (client.getOutputStream(), true);
 
-            while ((line = br.readLine()) != null){
-                System.out.println("Client says: " + line); 
-                pw.println("Server received: " + line);   
+            // while ((line = br.readLine()) != null){
+            //     System.out.println("Client says: " + line); 
+            //     pw.println("Server received: " + line);   
+            // }
+
+            while (!client.isClosed()) {
+                if (br.ready()) {
+                    String incoming = br.readLine();
+                    if (incoming != null) {
+                        System.out.println("Client says: " + line);
+                        pw.println("Server received: " + line);
+                    }
+                }
+
+                pw.println("ping");
+                System.out.println("Sent: ping");
+
+                TimeUnit.SECONDS.sleep(5);
             }
         }
         catch (Exception ex){
@@ -51,11 +67,10 @@ class Handler implements Runnable {
         } 
         finally {
             try {
-                client.close(); 
-            } catch (Exception ex) {
-                ex.printStackTrace();
+                client.close();
+            } catch (IOException ex) {
+                System.out.println("Error closing client socket: " + ex.getMessage());
             }
-
         }
     }
 }
