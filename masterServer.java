@@ -52,17 +52,30 @@ class Handler implements Runnable {
                     int size = input.readInt();
                     int [] values = new int [size];
 
+
+
                     for (int i = 0; i < size; i++){
                         values[i] = input.readInt();
                     }
 
-                    System.out.println("Received numbers: " + java.util.Arrays.toString(values));
-                    int sum = 0;
-                    for (int num : values) {
-                        sum += num;
-                }
+                    int[] chunk1 = Arrays.copyOfRange(values, 0, size / 2);
+                    int[] chunk2 = Arrays.copyOfRange(values, size / 2, size);
 
-                output.writeUTF("Server received " + size + " numbers. Sum: " + sum);
+                    System.out.println("Received numbers: " + java.util.Arrays.toString(values));
+                    int sum1 = 0;
+                    for (int num : chunk1) {
+                        sum1 += num;
+                    }   
+                    int sum2 = 0;
+                    for (int num : chunk2) {
+                        sum2 += num;
+                    }  
+
+
+                    
+                output.writeUTF("Server received for chunk 1 " + chunk1.length + " numbers. Sum: " + sum1);
+                output.writeUTF("Server received for chunk 2 " + chunk2.length + " numbers. Sum: " + sum2);
+
                 }
 
                 
