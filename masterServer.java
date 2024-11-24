@@ -41,7 +41,6 @@ class Handler implements Runnable {
         String line = " ";
 
         try {
-            BufferedReader br = new BufferedReader (new InputStreamReader (client.getInputStream()));
             PrintWriter pw = new PrintWriter (client.getOutputStream(), true);
 
             DataInputStream input = new DataInputStream(client.getInputStream());
@@ -74,7 +73,9 @@ class Handler implements Runnable {
 
                     
                 output.writeUTF("Server received for chunk 1 " + chunk1.length + " numbers. Sum: " + sum1);
+                output.flush();
                 output.writeUTF("Server received for chunk 2 " + chunk2.length + " numbers. Sum: " + sum2);
+                output.flush();
 
                 }
 
@@ -85,9 +86,10 @@ class Handler implements Runnable {
                 
 
                 TimeUnit.SECONDS.sleep(5);
-                input.close();
-                output.close();
+                
             }
+                // input.close();
+                // output.close();
         }
         catch (Exception ex){
             ex.printStackTrace();
