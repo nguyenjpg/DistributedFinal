@@ -5,53 +5,76 @@ import java.io.*;
 public class bubblesort {
 
     public static void main (String [] args) throws IOException {
-        Socket socket = new Socket ("localhost", 8000);
-        DataInputStream input = new DataInputStream(socket.getInputStream());
-        DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-
+        ServerSocket serverSocket = null;
 
         try {
-            while (true){
-                int size = input.readInt();
-        
-        
-                int [] numbers = new int[size];
-        
-                for (int i = 0; i < size; i++){
-                    numbers[i] = input.readInt();
+            serverSocket = new ServerSocket(9000);
+            System.out.println("Bubble Sort Server is running on port 9000...");
+
+            while (true) {
+                Socket socket = null;
+                DataInputStream input = null;
+                DataOutputStream output = null;
+
+                try {
+                    socket = serverSocket.accept();
+                    System.out.println("Connected to master server.");
+
+                    input = new DataInputStream(socket.getInputStream());
+                    output = new DataOutputStream(socket.getOutputStream());
+
+                    int size = input.readInt();
+                    int[] numbers = new int[size];
+                    for (int i = 0; i < size; i++) {
+                        numbers[i] = input.readInt();
+                    }
+
+                    System.out.println("Received numbers to sort: " + Arrays.toString(numbers));
+
+                    bubbleSort(numbers);
+
+                    output.writeInt(numbers.length);
+                    for (int num : numbers) {
+                        output.writeInt(num);
+                    }
+
+                    System.out.println("Sorted numbers sent back: " + Arrays.toString(numbers));
+                } catch (IOException ex) {
+                    System.err.println("Error handling connection: " + ex.getMessage());
+                } finally {
+                    try {
+                        if (input != null) 
+                        {
+                            input.close();
+                        }
+                        if (output != null){
+                            output.close();
+                        } 
+                        if (socket != null){
+                            socket.close();
+                        } 
+                    } catch (IOException ex) {
+                        System.err.println("Error closing resources: " + ex.getMessage());
+                    }
                 }
-        
-                bubbleSort(numbers);
-                output.writeInt(numbers.length);
-        
-                //System.out.println("Sorted numbers: " + Arrays.toString(numbers));
-                for (int num : numbers) {
-                    output.writeInt(num);
-                }
-        
             }
-           
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-        }  finally {
+        } catch (IOException ex) {
+            System.err.println("Error starting Bubble Sort Server: " + ex.getMessage());
+        } finally {
+
             try {
-                if (input != null){
-                    input.close();
-                } 
-                if (output != null){
-                    output.close();
-                }
-                if (socket != null){
-                    socket.close();
-                } 
+                if (serverSocket != null) serverSocket.close();
             } catch (IOException ex) {
-                System.err.println("Error closing client resources: " + ex.getMessage());
+                System.err.println("Error closing server socket: " + ex.getMessage());
             }
         }
+           
+    }
+       
+    
        
 
-    }
+    
 
     public static void bubbleSort(int[] array) {
         int n = array.length;

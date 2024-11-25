@@ -2,14 +2,17 @@ import java.io.*;
 import java.net.*;
 public class clientServer {
     public static void main(String[] args) throws IOException{
-        Socket socket = new Socket("localhost", 8000);
-        DataInputStream input = new DataInputStream(socket.getInputStream());
-        DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+        Socket socket = null;
+        DataInputStream input = null;
+        DataOutputStream output = null;
        
 
         String file = "/home/user/DistributedFinalGit/DistributedFinal-1/testValues.txt";
 
         try {
+            socket = new Socket("localhost", 8000);
+            input = new DataInputStream(socket.getInputStream());
+            output = new DataOutputStream(socket.getOutputStream());
            
             BufferedReader br = new BufferedReader(new FileReader(file));
 
@@ -41,8 +44,12 @@ public class clientServer {
                 }
             }
 
-            System.out.println("Server says: " + input.readUTF());
-            System.out.println("Server says: " + input.readUTF());
+            try {
+                System.out.println("Server says: " + input.readUTF());
+                System.out.println("Server says: " + input.readUTF()); 
+            } catch (EOFException ex) {
+                System.err.println("Unexpected end of stream. Ensure the server sends all responses.");
+            }
         }
         catch (Exception ex){
             ex.printStackTrace();
