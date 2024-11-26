@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: master-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: master-server
+  template:
+    metadata:
+      labels:
+        app: master-server
+    spec:  # Correctly indented
+      containers:
+      - name: master-server
+        image: master-server:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
